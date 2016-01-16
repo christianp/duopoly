@@ -435,6 +435,7 @@ Line.prototype = {
 			}
 			d+=' z';
 		} else {
+			this.length = 0;
 			d = 'M '+(this.x1+0.1)+' '+(this.y1+0.5)+' a 0.4,0.4 0 0 1 0.8,0 a 0.4,0.4 0 0 1 -0.8,0 z';
 		}
 		this.svg.setAttribute('d',d);
