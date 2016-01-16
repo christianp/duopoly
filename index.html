@@ -12,6 +12,15 @@
 				<div class="scores"></div>
 				<div class="win hidden"></div>
 				<svg class="board" width="100%" height="100%" viewBox="-0.5 -0.5 13 13">
+					<defs>
+						<pattern id="pattern-umpire" x="0" y="0" width="1" height="1" patternUnits="userSpaceOnUse">
+							<rect x="0" y="0" width="1" height="1"></rect>
+							<path fill="white" d="M 0.2 0 L 0.3 0 L 0 0.3 L 0 0.2 z"></path>
+							<path fill="white" d="M 0.45 0 L 0.55 0 L 0 0.55 L 0 0.45 z"></path>
+							<path fill="white" d="M 0.7 0 L 0.8 0 L 0 0.8 L 0 0.7 z"></path>
+							<path fill="white" d="M 1 0.2 L 1 0.3 L 0.3 1 L 0.2 1 z"></path>
+						</pattern>
+					</defs>
 					<rect class="background" x="0" y="0" width="12" height="12"></rect>
 					<g class="grid"></g>
 					<g class="lines"></g>
@@ -35,7 +44,7 @@
 			<ul>
 				<li>Take turns drawing lines on the board.</li>
 				<li>Each player must place two lines per turn.</li>
-				<li>When you connect two lines, you score the difference in their lengths.</li>
+				<li>When you draw a line between two existing lines, you score the difference in their lengths.</li>
 				<li>The game ends when the board is full.</li>
 			</ul>
 		</div>

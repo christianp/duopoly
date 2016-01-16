@@ -117,10 +117,6 @@ button.reset {
 	margin: 0.5rem auto;
 }
 
-.board * {
-	stroke-width: 0.002;
-}
-
 .board .background {
 	fill: white;
 }
@@ -136,7 +132,9 @@ button.reset {
 }
 
 .line {
-	fill: orange;
+	fill: grey;
+	stroke: hsl(200,50%,93%);
+	stroke-width: 0.05;
 }
 
 .line.overlap {

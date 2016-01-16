@@ -254,7 +254,7 @@ Game.prototype = {
 		var g = this;
 		var overlap = false;
 		line.squares().forEach(function(p) {
-			if(g.grid[p.x][p.y].occupied) {
+			if(g.occupied(p.x,p.y)) {
 				overlap = true;
 			}
 		});
@@ -288,41 +288,16 @@ Game.prototype = {
 
 		var scorers = [];
 		
-		/*
-		if(line.length>0) {
-			line.squares().forEach(function(p) {
-				var l1,l2;
-				switch(line.direction) {
-					case 'horizontal':
-						if(p.y>0 && p.y<g.size-1 && g.grid[p.x][p.y-1].occupied && g.grid[p.x][p.y+1].occupied) {
-							l1 = g.grid[p.x][p.y-1].line;
-							l2 = g.grid[p.x][p.y+1].line;
-						}
-						break;
-					case 'vertical':
-						if(p.x>0 && p.x<g.size-1 && g.grid[p.x-1][p.y].occupied && g.grid[p.x+1][p.y].occupied) {
-							l1 = g.grid[p.x-1][p.y].line;
-							l2 = g.grid[p.x+1][p.y].line;
-						}
-						break;
-				}
-				if(l1!==undefined) {
-					scorers.push({pos:p, score: Math.abs(l1.length-l2.length)});
-				}
-			});
-		}
-		*/
-		
 		var l1,l2;
 		switch(line.direction) {
 			case 'horizontal':
-				if(line.x1>0 && line.x2<g.size-1 && g.grid[line.x1-1][line.y1].occupied && g.grid[line.x2+1][line.y1].occupied) {
+				if(g.occupied(line.x1-1,line.y1) && g.occupied(line.x2+1,line.y1)) {
 					l1 = g.grid[line.x1-1][line.y1].line;
 					l2 = g.grid[line.x2+1][line.y1].line;
 				}
 				break;
 			case 'vertical':
-				if(line.y1>0 && line.y2<g.size-1 && g.grid[line.x1][line.y1-1].occupied && g.grid[line.x1][line.y2+1].occupied) {
+				if(g.occupied(line.x1,line.y1-1) && g.occupied(line.x1,line.y2+1)) {
 					l1 = g.grid[line.x1][line.y1-1].line;
 					l2 = g.grid[line.x1][line.y2+1].line;
 				}
@@ -346,7 +321,11 @@ Game.prototype = {
 		this.grid[x][y].occupied = true;
 		this.grid[x][y].line = line;
 		this.grid[x][y].svg.classList.add('occupied');
-	this.num_occupied += 1;
+		this.num_occupied += 1;
+	},
+
+	occupied: function(x,y) {
+		return x>=0 && x<this.size && y>=0 && y<this.size && this.grid[x][y].occupied;
 	},
 	
 	score: function(points,player) {
@@ -393,7 +372,7 @@ Line.prototype = {
 	
 	make_svg: function() {
 		var p = createElement('path',{class:'line'})
-		p.style['fill'] = this.player.colour;
+		p.style['fill'] = this.player.colour;//'url(#pattern-'+this.player.id+')';
 		this.svg = p;
 		return this.svg;
 	},
@@ -416,12 +395,43 @@ Line.prototype = {
 			this.x1 = Math.min(x1,x2);
 			this.x2 = Math.max(x1,x2);
 			this.length = this.x2-this.x1;
-			d = 'M '+(this.x1+0.5)+' '+(this.y1+0.9)+' a 0.4,0.4 0 0 1 0,-0.8 L '+(this.x2+0.5)+' '+(this.y2+0.1)+' a 0.4,0.4 0 0 1 0,0.8 z';
-		} else {
+
+			var connect = g.occupied(this.x1-1,this.y1) && g.occupied(this.x2+1,this.y1);
+			d = 'M '+(this.x1+0.5)+' '+(this.y1+0.9);
+			if(connect) {
+				d += ' a 0.4,0.4 0 0 1 -0.4,-0.3 L '+(this.x1-0.2)+' '+(this.y1+0.6)+' a 0.1,0.1 0 0 1 0,-0.2 L '+(this.x1+0.1)+' '+(this.y1+0.4)+' a 0.4,0.4 0 0 1 0.4,-0.3';
+			} else {
+				d += ' a 0.4,0.4 0 0 1 0,-0.8';
+			}
+			d +=' L '+(this.x2+0.5)+' '+(this.y2+0.1);
+			if(connect) {
+				d += ' a 0.4,0.4 0 0 1 0.4,0.3 L '+(this.x2+1.2)+' '+(this.y1+0.4)+' a 0.1,0.1 0 0 1 0,0.2 L '+(this.x2+0.9)+' '+(this.y1+0.6)+' a 0.4,0.4 0 0 1 -0.4,0.3';
+			} else {
+				d += ' a 0.4,0.4 0 0 1 0,0.8';
+			}
+			d+=' z';
+		} else if(this.direction=='vertical') {
 			this.y1 = Math.min(y1,y2);
 			this.y2 = Math.max(y1,y2);
 			this.length = this.y2-this.y1;
-			d = 'M '+(this.x1+0.1)+' '+(this.y1+0.5)+' a 0.4,0.4 0 0 1 0.8,0 L '+(this.x2+0.9)+' '+(this.y2+0.5)+' a 0.4,0.4 0 0 1 -0.8,0 z';
+
+			var connect = g.occupied(this.x1,this.y1-1) && g.occupied(this.x1,this.y2+1);
+			d = 'M '+(this.x1+0.1)+' '+(this.y1+0.5);
+			if(connect) {
+				d += ' a 0.4,0.4 0 0 1 0.3,-0.4 L '+(this.x1+0.4)+' '+(this.y1-0.2)+' a 0.1,0.1 0 0 1 0.2,0 L '+(this.x1+0.6)+' '+(this.y1+0.1)+' a 0.4,0.4 0 0 1 0.3,0.4';
+			} else {
+				d += ' a 0.4,0.4 0 0 1 0.8,0';
+			}
+			d +=' L '+(this.x1+0.9)+' '+(this.y2+0.5);
+			if(connect) {
+//				d += ' a 0.4,0.4 0 0 1 -0.4,0.3 L '+(this.x2+1.2)+' '+(this.y1+0.4)+' a 0.1,0.1 0 0 1 0,0.2 L '+(this.x2+0.9)+' '+(this.y1+0.6)+' a 0.4,0.4 0 0 1 -0.4,0.3';
+				d += ' a 0.4,0.4 0 0 1 -0.3,0.4 L '+(this.x1+0.6)+' '+(this.y2+1.2)+' a 0.1,0.1 0 0 1 -0.2,0 L '+(this.x1+0.4)+' '+(this.y2+0.9)+' a 0.4,0.4 0 0 1 -0.3,-0.4';
+			} else {
+				d += ' a 0.4,0.4 0 0 1 -0.8,0';
+			}
+			d+=' z';
+		} else {
+			d = 'M '+(this.x1+0.1)+' '+(this.y1+0.5)+' a 0.4,0.4 0 0 1 0.8,0 a 0.4,0.4 0 0 1 -0.8,0 z';
 		}
 		this.svg.setAttribute('d',d);
 	},
