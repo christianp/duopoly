@@ -247,6 +247,12 @@ Game.prototype = {
 			this.add_line(this.current_line);
 
 			this.current_line = null;
+
+			if(this.num_occupied >= this.size*this.size) {
+				this.end();
+			} else {
+				this.next_turn();
+			}
 		}
 	},
 
@@ -275,11 +281,6 @@ Game.prototype = {
 			g.occupy(p.x,p.y,line);
 		});		
 
-		if(this.num_occupied >= this.size*this.size) {
-			this.end();
-		} else {
-				this.next_turn();
-		}
 	},
 	
 	calculate_score: function() {
@@ -304,7 +305,7 @@ Game.prototype = {
 				break;
 		}
 		if(l1!==undefined) {
-			scorers.push({score: Math.abs(l1.length-l2.length)});
+			scorers.push({score: Math.abs(l1.length-l2.length)*(line.length+1)});
 		}
 		
 		var total = 0;
@@ -318,6 +319,9 @@ Game.prototype = {
 	},
 	
 	occupy: function(x,y,line) {
+		if(this.grid[x][y].occupied) {
+			console.log(x,y,'occupied');
+		}
 		this.grid[x][y].occupied = true;
 		this.grid[x][y].line = line;
 		this.grid[x][y].svg.classList.add('occupied');
