@@ -220,6 +220,7 @@ Game.prototype = {
 			if(!this.check_overlap(this.current_line)) {
 				place_button.classList.add('pulse');
 				place_button.removeAttribute('disabled');
+				place_button.style['background-color'] = this.current_player.colour;
 			} else {
 				place_button.classList.remove('pulse');
 				place_button.setAttribute('disabled','');
